@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from app import db
 from app.models import Group, Gender, Contact
 import random
@@ -44,7 +46,7 @@ for i in range(1, 1000):
     db.session.add(c)
     try:
         db.session.commit()
-        print "inserted", c
+        print("inserted", c)
     except:
         db.session.rollback()
     

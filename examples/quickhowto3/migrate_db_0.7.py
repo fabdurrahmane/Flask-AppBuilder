@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys
 import logging
 from flask import Flask
@@ -15,8 +17,8 @@ try:
 except Exception as e:
 
     if len(sys.argv) < 2:
-        print "Without typical app structure use parameter to config"
-        print "Use example for sqlite: python migrate_db_0.7.py sqlite:////home/user/application/app.db"
+        print("Without typical app structure use parameter to config")
+        print("Use example for sqlite: python migrate_db_0.7.py sqlite:////home/user/application/app.db")
         exit()
     con_str = sys.argv[1]
     app = Flask(__name__)

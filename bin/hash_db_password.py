@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import logging
 import sys
 from werkzeug.security import generate_password_hash
@@ -11,8 +13,8 @@ except:
     from flask.ext.sqlalchemy import SQLAlchemy
 
     if len(sys.argv) < 2:
-        print "Without typical app structure use parameter to config"
-        print "Use example: python hash_db_password.py sqlite:////home/user/application/app.db"
+        print("Without typical app structure use parameter to config")
+        print("Use example: python hash_db_password.py sqlite:////home/user/application/app.db")
         exit()
     con_str = sys.argv[1]
     app = Flask(__name__)
