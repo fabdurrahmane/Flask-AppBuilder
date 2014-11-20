@@ -96,7 +96,22 @@ class Select2Widget(widgets.Select):
         kwargs['data-placeholder'] = u'Select Value'
         if 'name_' in kwargs:
             field.name = kwargs['name_']
-        return super(Select2Widget, self).__call__(field, **kwargs)
+
+        kwargs.setdefault('id', field.id)
+        if self.multiple:
+            kwargs['multiple'] = True
+        
+        #if False:
+        #    html = ['<select %s>' % html_params(name=field.name, **kwargs)]
+        #    for val, label, selected in field.iter_choices():
+        #        html.append(self.render_option(val, label, selected))
+        #    html.append('</select>')
+        #else:
+        html = ['<input %s type = "hidden">' % html_params(name=field.name, **kwargs)]
+
+        html.append('</input>')
+
+        return HTMLString(''.join(html))
 
 
 
@@ -113,10 +128,11 @@ class Select2MasterWidget(widgets.Select):
 
 class Select2ManyWidget(widgets.Select):
     def __call__(self, field, **kwargs):
-        kwargs['class'] = u'my_select2'
+        kwargs['class'] = u'my_select2_many'
         kwargs['style'] = u'width:250px'
         kwargs['data-placeholder'] = u'Select Value'
         kwargs['multiple'] = u'true'
         if 'name_' in kwargs:
             field.name = kwargs['name_']
+
         return super(Select2ManyWidget, self).__call__(field, **kwargs)

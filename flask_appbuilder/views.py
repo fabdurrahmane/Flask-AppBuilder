@@ -1,4 +1,5 @@
 import logging
+import json
 from flask import render_template, flash, redirect, send_file, jsonify, request
 from .actions import action
 from ._compat import as_unicode
@@ -8,6 +9,7 @@ from .security.decorators import has_access, permission_name
 from .widgets import FormWidget, GroupFormListWidget, ListMasterWidget
 from .baseviews import expose, BaseView, BaseCRUDView
 from .urltools import *
+
 
 
 log = logging.getLogger(__name__)
@@ -173,8 +175,8 @@ class ModelView(BaseCRUDView):
     @expose('/add', methods=['GET', 'POST'])
     @has_access
     def add(self):
-
         widget = self._add()
+
         if not widget:
             return redirect(self.get_redirect())
         else:
@@ -187,6 +189,7 @@ class ModelView(BaseCRUDView):
     @permission_name('add')
     @expose('/add_post', methods=['POST'])
     def add_post(self):
+        print('It is adding')
         get_filter_args(self._filters)
         exclude_cols = self._filters.get_relation_cols()
 
@@ -296,6 +299,53 @@ class ModelView(BaseCRUDView):
             print("INVALID ACCESS ON {0} {1}".format(name, self.__class__.__name__))
             flash(as_unicode(lazy_gettext("Access is Denied")), "danger")
             return redirect('.')
+
+    @expose('/get_ajax_select/<string:col_name>')
+    @has_access
+    def get_ajax_select(self, col_name):
+        #field=getattr(self.datamodel,field_name)
+        
+        #cascade_query=[item for item in self.add_form_query_cascade if item[1]==field_name]
+        #if len(cascade_query)>1:
+        #    print(cascade_query)
+        #import pdb;pdb.set_trace()
+        #print(request.values)
+        #print(request.json)
+        
+        if self.add_form_query_cascade is not None:
+            #Todo add this properly
+            for filter_rel_field in self.add_form_query_cascade:
+                if filter_rel_field[0] == col_name:
+                    child_model = self.datamodel.get_model_relation(filter_rel_field[0])
+                    parent_model = self.datamodel.get_model_relation(filter_rel_field[1])
+                    parent = parent_model.get(request.values[filter_rel_field[1]])
+                    _filters = self.datamodel.get_filters().add_filter_list(sqla, filter_rel_field[2])
+                    q = child_model.query(_filters).join(parent_model)
+
+        elif (self.add_form_query_rel_fields is not None):
+            #Todo add this properly
+            for filter_rel_field in self.add_form_query_cascade:
+                if filter_rel_field[0] == col_name:
+                    # filter_rel_field[1] if the Data Interface class with model
+                    model = filter_rel_field[1]
+                    _filters = self.datamodel.get_filters().add_filter_list(sqla, filter_rel_field[2])
+                    q =  model.query(_filters)[1]
+        else:
+            rel_model = self.datamodel.get_model_relation(col_name)
+            q = self.datamodel.session.query(rel_model)
+        
+        field=getattr(self.add_form,col_name)
+        field.query=q
+        #Execute query
+        models = q.all()
+        choices=list()
+        items=list()
+        for mod in models:
+            items.append({ 'id': mod.id, 'text': str(mod) })
+
+        data={'results': items}
+
+        return json.dumps(data)
 
 
 class MasterDetailView(BaseCRUDView):

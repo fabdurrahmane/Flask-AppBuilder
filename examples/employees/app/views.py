@@ -1,6 +1,6 @@
 from flask_appbuilder import ModelView
 from flask_appbuilder.fieldwidgets import Select2Widget
-from flask.ext.appbuilder.models.datamodel import SQLAModel
+from flask_appbuilder.models.datamodel import SQLAModel
 from .models import Employee,Department, Function, EmployeeHistory, Benefit
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from app import appbuilder, db

@@ -6,7 +6,7 @@ import random
 import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float
 from sqlalchemy.orm import relationship
-from flask.ext.appbuilder import Model, SQLA
+from flask_appbuilder import Model, SQLA
 from flask_appbuilder.models.filters import FilterStartsWith, FilterEqual
 from flask_appbuilder.models.mixins import FileColumn, ImageColumn
 from flask_appbuilder.views import MasterDetailView, CompactCRUDMixin
@@ -15,7 +15,7 @@ from flask_appbuilder.charts.views import (ChartView, TimeChartView,
                                            DirectByChartView)
 from flask_appbuilder.models.group import aggregate_avg, aggregate_count, aggregate_sum
 
-from flask.ext.appbuilder.models.generic import PSSession
+from flask_appbuilder.models.generic import PSSession
 from flask_appbuilder.models.generic.interface import GenericInterface
 from flask_appbuilder.models.generic import PSModel
 
@@ -70,9 +70,9 @@ class Model2(Model):
 class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         from flask import Flask
-        from flask.ext.appbuilder import AppBuilder
-        from flask.ext.appbuilder.models.datamodel import SQLAModel
-        from flask.ext.appbuilder.views import ModelView
+        from flask_appbuilder import AppBuilder
+        from flask_appbuilder.models.datamodel import SQLAModel
+        from flask_appbuilder.views import ModelView
 
         self.app = Flask(__name__)
         self.basedir = os.path.abspath(os.path.dirname(__file__))

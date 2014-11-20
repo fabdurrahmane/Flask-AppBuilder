@@ -3,7 +3,7 @@ __author__ = 'dpgaspar'
 from flask import redirect
 from flask_appbuilder.security.views import UserDBModelView
 from flask_appbuilder.security.manager import SecurityManager
-from flask.ext.appbuilder.actions import action
+from flask_appbuilder.actions import action
 
 
 class MyUserDBView(UserDBModelView):
