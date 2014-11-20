@@ -1,4 +1,4 @@
-from flask.ext.appbuilder Model
+from flask_appbuilder import Model
 
 """
 
