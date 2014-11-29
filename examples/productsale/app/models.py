@@ -44,3 +44,18 @@ class Client(User):
     extra = Column(String(50), unique=True, nullable=False)
 
 
+class PurchaseOrder(Model):
+
+    id = Column(Integer, primary_key=True)
+    client_id=Column(Integer,ForeignKey('ab_user.id'))
+    product_type_id = Column(Integer,ForeignKey('product_type.id'))
+    product_id=Column(Integer,ForeignKey('product.id'))
+    product = relationship("Product")
+    product_type = relationship("ProductType")
+    client = relationship("User")
+    quantity = Column(Integer)
+
+  
+
+
+

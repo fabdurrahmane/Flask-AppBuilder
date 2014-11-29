@@ -1,8 +1,10 @@
-from models import Product, ProductType, Sale
-from flask.ext.appbuilder.views import ModelView, BaseView
-from flask.ext.appbuilder.charts.views import ChartView
-from flask.ext.appbuilder.models.datamodel import SQLAModel
-from flask.ext.appbuilder.widgets import ListBlock, ShowBlockWidget
+from .models import Product, ProductType, PurchaseOrder
+from flask_appbuilder.views import ModelView, BaseView
+from flask_appbuilder.charts.views import ChartView
+from flask_appbuilder.models.datamodel import SQLAModel
+from flask_appbuilder.widgets import ListBlock, ShowBlockWidget
+from flask_appbuilder.models.filters import FilterEqual
+
 
 from app import appbuilder, db
 
@@ -32,6 +34,16 @@ class ProductTypeView(ModelView):
     datamodel = SQLAModel(ProductType)
     related_views = [ProductView]
 
+class ProductTypeView(ModelView):
+    datamodel = SQLAModel(ProductType)
+    related_views = [ProductView]
+
+class PurchaseOrderView(ModelView):
+    datamodel = SQLAModel(PurchaseOrder)
+
+    add_form_query_cascade=[('product','product_type',SQLAModel(Product, db.session),[['id',FilterEqual,'product_type']])]
+
+
 
 db.create_all()
 appbuilder.add_view(ProductPubView, "Our Products", icon="fa-folder-open-o")
@@ -39,3 +51,4 @@ appbuilder.add_view(ProductView, "List Products", icon="fa-folder-open-o", categ
 appbuilder.add_separator("Management")
 appbuilder.add_view(ProductTypeView, "List Product Types", icon="fa-envelope", category="Management")
 
+appbuilder.add_view(PurchaseOrderView, "PurchaseOrderView", icon="fa-envelope", category="Management")

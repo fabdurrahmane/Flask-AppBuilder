@@ -3,13 +3,14 @@ import json
 from flask import render_template, flash, redirect, send_file, jsonify, request
 from .actions import action
 from ._compat import as_unicode
-from flask_babelpkg import lazy_gettext
+from flask_babel import lazy_gettext
 from .filemanager import uuid_originalname
 from .security.decorators import has_access, permission_name
 from .widgets import FormWidget, GroupFormListWidget, ListMasterWidget
 from .baseviews import expose, BaseView, BaseCRUDView
 from .urltools import *
 
+from flask_appbuilder.models.datamodel import SQLAModel
 
 
 log = logging.getLogger(__name__)
@@ -303,45 +304,51 @@ class ModelView(BaseCRUDView):
     @expose('/get_ajax_select/<string:col_name>')
     @has_access
     def get_ajax_select(self, col_name):
-        #field=getattr(self.datamodel,field_name)
         
-        #cascade_query=[item for item in self.add_form_query_cascade if item[1]==field_name]
-        #if len(cascade_query)>1:
-        #    print(cascade_query)
-        #import pdb;pdb.set_trace()
-        #print(request.values)
-        #print(request.json)
-        
+        #apply all filters
         if self.add_form_query_cascade is not None:
             #Todo add this properly
+            cascade = False 
+            
             for filter_rel_field in self.add_form_query_cascade:
                 if filter_rel_field[0] == col_name:
-                    child_model = self.datamodel.get_model_relation(filter_rel_field[0])
-                    parent_model = self.datamodel.get_model_relation(filter_rel_field[1])
-                    parent = parent_model.get(request.values[filter_rel_field[1]])
-                    _filters = self.datamodel.get_filters().add_filter_list(sqla, filter_rel_field[2])
-                    q = child_model.query(_filters).join(parent_model)
+                    cascade =True
+                    child_model = filter_rel_field[2]
+                    parent_value = request.values[filter_rel_field[1]]
+                    dynamic_filter = filter_rel_field[3][0]
+                    #Set dynamic
+                    dynamic_filter[2] = parent_value
+                    #Add Filter
+                    _filters = self.datamodel.get_filters().add_filter_list(child_model, [dynamic_filter])
+                    #Get Query
+
+                    models = child_model.query(_filters)
+
+            if cascade is False:
+                rel_model = SQLAModel(self.datamodel.get_model_relation(col_name),self.datamodel.session)
+                _filters = self.datamodel.get_filters()
+
+                #q = self.datamodel.session.query(rel_model)
+                models =  rel_model.query(_filters)
 
         elif (self.add_form_query_rel_fields is not None):
             #Todo add this properly
-            for filter_rel_field in self.add_form_query_cascade:
+            for filter_rel_field in self.add_form_query_rel_fields:
                 if filter_rel_field[0] == col_name:
-                    # filter_rel_field[1] if the Data Interface class with model
                     model = filter_rel_field[1]
-                    _filters = self.datamodel.get_filters().add_filter_list(sqla, filter_rel_field[2])
-                    q =  model.query(_filters)[1]
+                    _filters = self.datamodel.get_filters().add_filter_list(model, filter_rel_field[2])
+                    models =  model.query(_filters)
         else:
-            rel_model = self.datamodel.get_model_relation(col_name)
-            q = self.datamodel.session.query(rel_model)
-        
-        field=getattr(self.add_form,col_name)
-        field.query=q
-        #Execute query
-        models = q.all()
-        choices=list()
-        items=list()
-        for mod in models:
+            rel_model = SQLAModel(self.datamodel.get_model_relation(col_name),self.datamodel.session)
+            _filters = self.datamodel.get_filters()
+
+            #q = self.datamodel.session.query(rel_model)
+            models =  rel_model.query(_filters)
+        items = list()
+        for mod in models[1]:
             items.append({ 'id': mod.id, 'text': str(mod) })
+
+    
 
         data={'results': items}
 

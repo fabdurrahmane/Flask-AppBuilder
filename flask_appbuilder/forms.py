@@ -121,8 +121,8 @@ class GeneralModelConverter(object):
                 sqla = cascade_rel_field[2]
 
                 filter_item = list(cascade_rel_field[3])
-                related_model = sqla._get_related_model(filter_item[0])[0]
-                filter_item[2] = partial(get_cascade_value_helper, col_name=filter_item[2])
+           #     related_model = sqla._get_related_model(filter_item[0])[0]
+             #   filter_item[2] = partial(get_cascade_value_helper, col_name=filter_item[2])
                 
                 _filters = self.datamodel.get_filters().add_filter_list(sqla, [filter_item])
                 return lambda: sqla.query(_filters)[1]
@@ -159,15 +159,18 @@ class GeneralModelConverter(object):
             will use a Select box based on a query. Will only
             work with SQLAlchemy interface.
         """
-        if self._is_slave_cascade_field(col_name, cascade_rel_fields):
-            query_func = self._get_func_cascade_query(col_name, filter_rel_fields, cascade_rel_fields, form_props)
-        else:
-            query_func = self._get_func_related_query(col_name, filter_rel_fields)
-        extra_classes = None
-        if self._is_master_cascade_field(col_name, cascade_rel_fields):
-            # it's master field get's css class for on change post.
-            extra_classes = 'json_select2'
+        #if self._is_slave_cascade_field(col_name, cascade_rel_fields):
+        #    query_func = self._get_func_cascade_query(col_name, filter_rel_fields, cascade_rel_fields, form_props)
+        #else:
+        #    query_func = self._get_func_related_query(col_name, filter_rel_fields)
+        #extra_classes = None
+        #if self._is_master_cascade_field(col_name, cascade_rel_fields):
+        #    # it's master field get's css class for on change post.
+        #    extra_classes = 'json_select2'
+        query_func = self._get_func_related_query(col_name, filter_rel_fields)
+
         allow_blank = True
+        extra_classes = None
         col = self.datamodel.get_relation_fk(col_name)
         if not col.nullable:
             lst_validators.append(validators.Required())
